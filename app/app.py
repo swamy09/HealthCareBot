@@ -16,7 +16,7 @@ from config import (
 )
 
 #where we are importing the Rag chain from rag file
-from rag import create_rag_chain
+from rag_chain import create_rag_chain
 
 #flash initialisation
 app = Flask(__name__)
