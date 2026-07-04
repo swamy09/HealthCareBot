@@ -1,0 +1,70 @@
+name: Deploy Healthcare RAG to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: healthcare-rag
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the latest code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Login to Azure
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId":"${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}",
+              "subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}",
+              "tenantId":"${{ secrets.AZURE_TENANT_ID }}"
+            }
+
+      # Step 3: Login to Azure Container Registry
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: healthcarecontainer97.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # Step 4: Build Docker Image
+      - name: Build Docker Image
+        run: |
+          docker build \
+          -t healthcarecontainer97.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          -t healthcarecontainer97.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+          .
+
+      # Step 5: Push Docker Image
+      - name: Push Docker Image
+        run: |
+          docker push healthcarecontainer97.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push healthcarecontainer97.azurecr.io/${{ env.IMAGE_NAME }}:latest
+
+      # Step 6: Configure Azure Web App to use the latest image
+      - name: Configure Web App Container
+        run: |
+          az webapp config container set \
+            --name Healthcareapp \
+            --resource-group Deploy \
+            --docker-custom-image-name healthcarecontainer97.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+            --docker-registry-server-url https://healthcarecontainer97.azurecr.io \
+            --docker-registry-server-user ${{ secrets.ACR_USERNAME }} \
+            --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}
+
+      # Step 7: Restart the Web App
+      - name: Restart Azure Web App
+        run: |
+          az webapp restart \
+            --name Healthcareapp \
+            --resource-group Deploy
