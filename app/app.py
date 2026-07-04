@@ -48,7 +48,7 @@ def chat():
 
     print("RAG chain finished.")
     print("Bot:", response)
-    print("")
+ 
 
     return response
 
