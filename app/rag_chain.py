@@ -3,7 +3,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
 from config import (
-    llm
+    answer_llm
 )
 
 
@@ -45,7 +45,7 @@ Context:
     rag_chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
         | prompt
-        | llm
+        | answer_llm
         | StrOutputParser()
     )
 

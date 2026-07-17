@@ -12,13 +12,16 @@ from config import (
     embedding_model,
     PINECONE_API_KEY,
     PINECONE_INDEX,
-    llm
+    answer_llm
 )
 
-#where we are importing the Rag chain from rag file
+#to run legacy
 from rag_chain import create_rag_chain
 
-#flash initialisation
+#where we are importing the Rag chain from rag file
+#from workflows.agentic_rag import AgenticRAG
+
+#flash initialisation 
 app = Flask(__name__)
 
 #we are accessing the pineconeindex which we have built
@@ -28,6 +31,9 @@ docsearch = PineconeVectorStore.from_existing_index(
     )
 
 #create the Rag chain
+#agentic_rag = AgenticRAG(docsearch)
+
+#to run legacy
 rag_chain = create_rag_chain(docsearch)
 
 
@@ -44,7 +50,10 @@ def chat():
     print("User:", msg)
     print("Calling RAG chain...")
 
+    # to run legacy
     response = rag_chain.invoke(msg)
+
+    #response = agentic_rag.invoke(msg)
 
     print("RAG chain finished.")
     print("Bot:", response)

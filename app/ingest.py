@@ -3,6 +3,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
 
+
 from config import (
     embedding_model,
     PINECONE_API_KEY,
@@ -43,7 +44,7 @@ def create_pinecone_index():
 # now we will embedd the model.
 
 def ingest_vector_pinecone(index_name,documents):
-    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=200)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=200, separators=["\n\n","\n", " "])
     chunks = splitter.split_documents(documents)
 
     print(f"Total chunks: {len(chunks)}")
@@ -63,6 +64,7 @@ def ingest_vector_pinecone(index_name,documents):
     # )
 # to add the new documents to same pinecone index
     # docsearch.add_documents(documents=[])
+
 
 
     print("Documents uploaded successfully!")

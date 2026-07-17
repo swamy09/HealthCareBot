@@ -11,7 +11,7 @@ embedding_model = NVIDIAEmbeddings(
     model="nvidia/nv-embedqa-e5-v5"
 )
 
-llm = ChatNVIDIA(
-    model="moonshotai/kimi-k2.6",
+answer_llm = ChatNVIDIA(
+    model="deepseek-ai/deepseek-v4-flash",
     temperature=0.3
 )
